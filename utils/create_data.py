@@ -192,8 +192,11 @@ def get_cifar10():
   y = None
   for member in tar_dir.getnames():
     if '_batch' in member:
-      filestream = tar_dir.extractfile(member).read()
-      batch = pickle.load(StringIO.StringIO(filestream))
+
+      # https://stackoverflow.com/questions/37512290/reading-cifar10-dataset-in-batches/51694265
+      filestream = tar_dir.extractfile(member)
+      batch = pickle.load(filestream, encoding='latin1')
+
       if X is None:
         X = np.array(batch['data'], dtype=np.uint8)
         y = np.array(batch['labels'])
@@ -274,6 +277,8 @@ def main(argv):
               ('mnist_keras', 'mnist_keras'),
               ('wikipedia_attack', 'wikipedia_attack'),
               ('rcv1', 'rcv1')]
+# newsgroup (warning) I0926 22:37:27.478590 139797918323520 _twenty_newsgroups.py:257] Downloading 20news dataset. This may take a few minutes.
+# rcv1 (warning) I0926 23:40:00.677289 140626801791808 _rcv1.py:172] Downloading https://ndownloader.figshare.com/files/5976069
 
   if FLAGS.datasets:
     subset = FLAGS.datasets.split(',')
