@@ -214,7 +214,7 @@ def generate_one_curve(X,
   results = {}
   data_sizes = []
   accuracy = []
-  selected_inds = range(seed_batch)
+  selected_inds = list(range(seed_batch))
 
   # If select model is None, use score_model
   same_score_select = False
