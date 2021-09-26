@@ -25,9 +25,13 @@ from __future__ import print_function
 from io import BytesIO
 import os
 import pickle
-import StringIO
+try:
+    from StringIO import StringIO ## for Python 2
+except ImportError:
+    from io import StringIO ## for Python 3
+
 import tarfile
-import urllib2
+import urllib.request as urllib2
 
 import keras.backend as K
 from keras.datasets import cifar10
