@@ -41,10 +41,10 @@ from keras.datasets import mnist
 import numpy as np
 import pandas as pd
 from sklearn.datasets import fetch_20newsgroups_vectorized
-from sklearn.datasets import fetch_mldata
+from sklearn.datasets import fetch_openml
 from sklearn.datasets import load_breast_cancer
 from sklearn.datasets import load_iris
-import sklearn.datasets.rcv1
+from sklearn.datasets import fetch_rcv1
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 
@@ -226,13 +226,13 @@ def get_mldata(dataset):
       X = tfidf.fit_transform(data.data)
       data.data = X
     elif dataset[0] == 'rcv1':
-      sklearn.datasets.rcv1.URL = (
+      fetch_rcv1.URL = (
         'http://www.ai.mit.edu/projects/jmlr/papers/'
         'volume5/lewis04a/a13-vector-files/lyrl2004_vectors')
-      sklearn.datasets.rcv1.URL_topics = (
+      fetch_rcv1.URL_topics = (
         'http://www.ai.mit.edu/projects/jmlr/papers/'
         'volume5/lewis04a/a08-topic-qrels/rcv1-v2.topics.qrels.gz')
-      data = sklearn.datasets.fetch_rcv1(
+      data = fetch_rcv1(
           data_home='/tmp')
     elif dataset[0] == 'wikipedia_attack':
       data = get_wikipedia_talk_data()
@@ -242,7 +242,7 @@ def get_mldata(dataset):
       data = get_keras_data(dataset[0])
     else:
       try:
-        data = fetch_mldata(dataset[0])
+        data = fetch_openml("mnist_784")
       except:
         raise Exception('ERROR: failed to fetch data from mldata.org')
     X = data.data
