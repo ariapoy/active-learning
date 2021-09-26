@@ -199,6 +199,10 @@ def generate_one_curve(X,
     X_train = scaler.transform(X_train)
     X_val = scaler.transform(X_val)
     X_test = scaler.transform(X_test)
+  y_train = y_train.values
+  y_val = y_val.values
+  y_test = y_test.values
+
   print("active percentage: " + str(active_p) + " warmstart batch: " +
         str(seed_batch) + " batch size: " + str(batch_size) + " confusion: " +
         str(confusion) + " seed: " + str(seed))
