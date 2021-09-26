@@ -41,7 +41,7 @@ from sklearn.preprocessing import StandardScaler
 
 from absl import app
 from absl import flags
-from tensorflow import gfile
+import tensorflow.compat.v1.gfile as gfile
 
 from sampling_methods.constants import AL_MAPPING
 from sampling_methods.constants import get_AL_sampler
