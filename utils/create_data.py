@@ -52,7 +52,7 @@ from absl import app
 from absl import flags
 import tensorflow.compat.v1.gfile as gfile
 
-flags.DEFINE_string('save_dir', '/tmp/data',
+flags.DEFINE_string('save_dir', '../tmp/data',
                     'Where to save outputs')
 flags.DEFINE_string('datasets', '',
                     'Which datasets to download, comma separated.')
@@ -236,7 +236,7 @@ def get_mldata(dataset):
         'http://www.ai.mit.edu/projects/jmlr/papers/'
         'volume5/lewis04a/a08-topic-qrels/rcv1-v2.topics.qrels.gz')
       data = fetch_rcv1(
-          data_home='/tmp')
+          data_home='../tmp')
     elif dataset[0] == 'wikipedia_attack':
       data = get_wikipedia_talk_data()
     elif dataset[0] == 'cifar10':

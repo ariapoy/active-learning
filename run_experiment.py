@@ -78,9 +78,9 @@ flags.DEFINE_string(
 flags.DEFINE_string("normalize_data", "False", "Whether to normalize the data.")
 flags.DEFINE_string("standardize_data", "True",
                     "Whether to standardize the data.")
-flags.DEFINE_string("save_dir", "/tmp/toy_experiments",
+flags.DEFINE_string("save_dir", "./tmp/toy_experiments",
                     "Where to save outputs")
-flags.DEFINE_string("data_dir", "/tmp/data",
+flags.DEFINE_string("data_dir", "./tmp/data",
                     "Directory with predownloaded and saved datasets.")
 flags.DEFINE_string("max_dataset_size", "15000",
                     ("maximum number of datapoints to include in data "
