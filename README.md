@@ -21,6 +21,14 @@ Below I will go into each component in more detail.
 DISCLAIMER: This is not an official Google product.
 
 ## Setup
+
+**Anaconda version.**
+
+```shell
+conda env create -f environment.yml
+conda activate google-AL
+```
+
 The dependencies are in [`requirements.txt`](requirements.txt).  Please make sure these packages are
 installed before running experiments.  If GPU capable `tensorflow` is desired, please follow
 instructions [here](https://www.tensorflow.org/install/).
