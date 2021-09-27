@@ -321,9 +321,9 @@ def get_train_val_test_splits(X, y, max_points, seed, confusion, seed_batch,
     y_tmp = y_noise[indices]
     n_shuffle += 1
 
-  X_train = X_copy.loc[indices[0:train_split], :]
-  X_val = X_copy.loc[indices[train_split:val_split], :]
-  X_test = X_copy.loc[indices[val_split:max_points], :]
+  X_train = X_copy[indices[0:train_split], :]
+  X_val = X_copy[indices[train_split:val_split], :]
+  X_test = X_copy[indices[val_split:max_points], :]
   y_train = y_noise[indices[0:train_split]]
   y_val = y_noise[indices[train_split:val_split]]
   y_test = y_noise[indices[val_split:max_points]]
