@@ -48,21 +48,32 @@ from sampling_methods.constants import get_AL_sampler
 from sampling_methods.constants import get_wrapper_AL_mapping
 from utils import utils
 
-flags.DEFINE_string("dataset", "letter", "Dataset name")
-flags.DEFINE_string("sampling_method", "margin",
+import pdb
+
+dataname = "iris"
+n_labeled = 20
+qsname = "uniform"
+modelname = "kernel_svm"
+# train_valid_test_ratio_list = [0.6, 0, 0.4]  # paper's statement
+train_valid_test_ratio_list = [0.5, 0.1, 0.4]  # valid.shape > 1
+num_trials = 1
+batch_size_query = 1
+
+flags.DEFINE_string("dataset", dataname, "Dataset name")
+flags.DEFINE_string("sampling_method", qsname,
                     ("Name of sampling method to use, can be any defined in "
                      "AL_MAPPING in sampling_methods.constants"))
 flags.DEFINE_float(
-    "warmstart_size", 0.02,
+    "warmstart_size", n_labeled,
     ("Can be float or integer.  Float indicates percentage of training data "
      "to use in the initial warmstart model")
 )
 flags.DEFINE_float(
-    "batch_size", 0.02,
+    "batch_size", batch_size_query,
     ("Can be float or integer.  Float indicates batch size as a percentage "
      "of training data size.")
 )
-flags.DEFINE_integer("trials", 1,
+flags.DEFINE_integer("trials", num_trials,
                      "Number of curves to create using different seeds")
 flags.DEFINE_integer("seed", 1, "Seed to use for rng and random state")
 # TODO(lisha): add feature noise to simulate data outliers
@@ -70,7 +81,7 @@ flags.DEFINE_string("confusions", "0.", "Percentage of labels to randomize")
 flags.DEFINE_string("active_sampling_percentage", "1.0",
                     "Mixture weights on active sampling.")
 flags.DEFINE_string(
-    "score_method", "logistic",
+    "score_method", modelname,
     "Method to use to calculate accuracy.")
 flags.DEFINE_string(
     "select_method", "None",
@@ -165,7 +176,7 @@ def generate_one_curve(X,
     return batch_AL + batch_PL
 
   np.random.seed(seed)
-  data_splits = [2./3, 1./6, 1./6]
+  data_splits = train_valid_test_ratio_list
 
   # 2/3 of data for training
   if max_points is None:
