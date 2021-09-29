@@ -245,7 +245,10 @@ def get_mldata(dataset):
       data = get_keras_data(dataset[0])
     else:
       try:
-        data = fetch_openml("mnist_784")
+        if len(dataset) == 3:
+          data = fetch_openml(data_id=dataset[-1])
+        else:
+          data = fetch_openml(dataset[1])
       except:
         raise Exception('ERROR: failed to fetch data from mldata.org')
     X = data.data
@@ -265,10 +268,10 @@ def main(argv):
   datasets = [('mnist (original)', 'mnist'), ('australian', 'australian'),
               ('heart', 'heart'), ('breast_cancer', 'breast_cancer'),
               ('iris', 'iris'), ('vehicle', 'vehicle'), ('wine', 'wine'),
-              ('waveform ida', 'waveform'), ('german ida', 'german'),
+              ('waveform ida', 'waveform-5000'), ('german.numer', 'german.numer'),
               ('splice ida', 'splice'), ('ringnorm ida', 'ringnorm'),
-              ('twonorm ida', 'twonorm'), ('diabetes_scale', 'diabetes'),
-              ('mushrooms', 'mushrooms'), ('letter', 'letter'), ('dna', 'dna'),
+              ('twonorm ida', 'twonorm'), ('diabetes_scale', 'diabetes', 37),
+              ('mushrooms', 'mushrooms', 24), ('letter', 'letter'), ('dna', 'dna'),
               ('banana-ida', 'banana'), ('letter', 'letter'), ('dna', 'dna'),
               ('newsgroup', 'newsgroup'), ('cifar10', 'cifar10'),
               ('cifar10_keras', 'cifar10_keras'),
@@ -276,7 +279,7 @@ def main(argv):
               ('cifar100_coarse_keras', 'cifar100_coarse_keras'),
               ('mnist_keras', 'mnist_keras'),
               ('wikipedia_attack', 'wikipedia_attack'),
-              ('rcv1', 'rcv1')]
+              ('rcv1', 'rcv1')] + [("sonar", "sonar"), ("seeds", "seeds"), ("glass", "glass", 41), ("thyroid-new", "thyroid-new"), ("haberman", "haberman"), ("ionosphere", "ionosphere"), ("clean1", "clean1"), ("wdbc", "wdbc")]
 # newsgroup (warning) I0926 22:37:27.478590 139797918323520 _twenty_newsgroups.py:257] Downloading 20news dataset. This may take a few minutes.
 # rcv1 (warning) I0926 23:40:00.677289 140626801791808 _rcv1.py:172] Downloading https://ndownloader.figshare.com/files/5976069
 
