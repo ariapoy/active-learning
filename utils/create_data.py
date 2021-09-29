@@ -248,7 +248,7 @@ def get_mldata(dataset):
         if len(dataset) == 3:
           data = fetch_openml(data_id=dataset[-1])
         else:
-          data = fetch_openml(dataset[1])
+          data = fetch_openml(dataset[0])
       except:
         raise Exception('ERROR: failed to fetch data from mldata.org')
     X = data.data
@@ -265,14 +265,14 @@ def main(argv):
   del argv  # Unused.
   # First entry of tuple is mldata.org name, second is the name that we'll use
   # to reference the data.
-  datasets = [('mnist (original)', 'mnist'), ('australian', 'australian'),
+  datasets = [('mnist_784', 'mnist (original)'), ('australian', 'australian'),
               ('heart', 'heart'), ('breast_cancer', 'breast_cancer'),
               ('iris', 'iris'), ('vehicle', 'vehicle'), ('wine', 'wine'),
-              ('waveform ida', 'waveform-5000'), ('german.numer', 'german.numer'),
-              ('splice ida', 'splice'), ('ringnorm ida', 'ringnorm'),
-              ('twonorm ida', 'twonorm'), ('diabetes_scale', 'diabetes', 37),
+              ('waveform-5000', 'waveform'), ('german.numer', 'german'),
+              ('splice', 'splice'), ('ringnorm', 'ringnorm'),
+              ('twonorm', 'twonorm'), ('diabetes', 'diabetes', 37),
               ('mushrooms', 'mushrooms', 24), ('letter', 'letter'), ('dna', 'dna'),
-              ('banana-ida', 'banana'), ('letter', 'letter'), ('dna', 'dna'),
+              ('banana', 'banana'), ('letter', 'letter'), ('dna', 'dna'),
               ('newsgroup', 'newsgroup'), ('cifar10', 'cifar10'),
               ('cifar10_keras', 'cifar10_keras'),
               ('cifar100_keras', 'cifar100_keras'),
