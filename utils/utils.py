@@ -24,6 +24,7 @@ import sys
 
 import numpy as np
 import scipy
+import pandas as pd
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV
@@ -293,6 +294,12 @@ def get_train_val_test_splits(X, y, max_points, seed, confusion, seed_batch,
       run_experiments using original data.
   """
   np.random.seed(seed)
+
+  if isinstance(X, pd.DataFrame):
+    X = X.values
+  if isinstance(y, pd.Series):
+    y = y.values
+
   X_copy = copy.copy(X)
   y_copy = copy.copy(y)
 
