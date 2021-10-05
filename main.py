@@ -59,22 +59,25 @@ num_labeled = 20
 qsname = "uniform"
 modelname = "kernel_svm"
 train_valid_test_ratio_list = [0.6, 0, 0.4]
-num_trials = 5
+num_trials = 100
 batch_size_query = 1
+dev_mode = False
+
+normalize_data = "False"
+standardize_data = "False"
+tune_hyperparam = "False"
 
 sampling_method = qsname
 warmstart_size = num_labeled
 batch_size = batch_size_query
 trials = num_trials
-seed = 1
+seed = 0
 confusions = "0."
 confusions = confusions.split(" ")
 active_sampling_percentage = "1.0"
 active_sampling_percentage = active_sampling_percentage.split(" ")
 score_method = modelname
 select_method = "None"
-normalize_data = "False"
-standardize_data = "False"
 max_dataset_size = "15000"
 train_horizon = 1.0
 data_dir = "./tmp/data"
@@ -202,6 +205,7 @@ def generate_one_curve(X,
   results = {}
   data_sizes = []
   accuracy = []
+  # initial label
   selected_inds = list(range(seed_batch))
 
   # If select model is None, use score_model
@@ -275,11 +279,13 @@ def OLHC(lc):
 
 # main
 # dataname = "iris"
+# datanames_list = ["heart"]
 datanames_list = ["iris", "wine", "sonar", "seeds", "glass", "thyroid-new", "heart", "haberman", "ionosphere", "clean1", "wdbc", "australian", "diabetes", "vehicle", "german.numer"]
 report = {"dataset": [], "AUBC google/active-learning.RS": []}
 report2 = {"dataset": [], "OLHC google/active-learning.RS": []}
 
 def run(seed):
+    # Initialize models
     sampler = get_AL_sampler(sampling_method)
     score_model = utils.get_model(score_method, seed)
     if (select_method == "None" or
@@ -287,6 +293,7 @@ def run(seed):
         select_model = None
     else:
         select_model = utils.get_model(select_method, seed)
+
     results, sampler_state = generate_one_curve(
         X, y, sampler, score_model, seed, warmstart_size,
         batch_size, select_model, c, m, max_dataset_size,
@@ -313,31 +320,17 @@ for dataname in tqdm(datanames_list):
 
     for c in confusions:
         for m in mixtures:
-            with Pool(5) as p:
-                imap_unordered_it = p.imap_unordered(run, 
+            if dev_mode:
+                for seed in range(3):
+                    key_curr, results_curr = run(seed)
+                    all_results[key_curr] = results_curr
+            else:
+                with Pool(6) as p:
+                    imap_unordered_it = p.imap_unordered(run,
                                             range(starting_seed, starting_seed + trials)
                                         )
-                for res in imap_unordered_it:
-                    all_results[res[0]] = res[1]
-
-            # for seed in range(starting_seed, starting_seed + trials):
-            #     sampler = get_AL_sampler(sampling_method)
-            #     score_model = utils.get_model(score_method, seed)
-            #     if (select_method == "None" or
-            #         select_method == score_method):
-            #         select_model = None
-            #     else:
-            #         select_model = utils.get_model(select_method, seed)
-            #     results, sampler_state = generate_one_curve(
-            #         X, y, sampler, score_model, seed, warmstart_size,
-            #         batch_size, select_model, c, m, max_dataset_size,
-            #         standardize_data, normalize_data, train_horizon)
-            #     key = (dataset, sampling_method, score_method,
-            #             select_method, m, warmstart_size, batch_size,
-            #             c, standardize_data, normalize_data, seed)
-            #     sampler_output = sampler_state.to_dict()
-            #     results["sampler_output"] = sampler_output
-            #     all_results[key] = results
+                    for res in imap_unordered_it:
+                        all_results[res[0]] = res[1]
 
     table3_lcs_RS = []
     for exp_key in all_results:
