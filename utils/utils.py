@@ -201,7 +201,7 @@ def flip_label(y, percent_random):
   return y
 
 
-def get_model(method, seed=13):
+def get_model(method, seed=13, is_gridsearch=False):
   """Construct sklearn model using either logistic regression or linear svm.
 
   Wraps grid search on regularization parameter over either logistic regression
@@ -247,7 +247,10 @@ def get_model(method, seed=13):
   else:
     raise NotImplementedError("ERROR: " + method + " not implemented")
 
-  model = GridSearchCV(model, params, cv=3)
+  if is_gridsearch:
+    model = GridSearchCV(model, params, cv=3)
+  else:
+    pass
   return model
 
 

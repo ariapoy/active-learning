@@ -287,7 +287,9 @@ report2 = {"dataset": [], "OLHC google/active-learning.RS": []}
 def run(seed):
     # Initialize models
     sampler = get_AL_sampler(sampling_method)
-    score_model = utils.get_model(score_method, seed)
+    global tune_hyperparam
+    tune_hyperparam = tune_hyperparam == "True"
+    score_model = utils.get_model(score_method, seed, is_gridsearch=tune_hyperparam)
     if (select_method == "None" or
         select_method == score_method):
         select_model = None
@@ -350,5 +352,5 @@ for dataname in tqdm(datanames_list):
 reportAUBC = pd.DataFrame(report)
 reportLCOLHC = pd.DataFrame(report2)
 
-reportAUBC.to_csv("Table1-RS-AUBC-RSGoogle.csv", index=None)
-reportLCOLHC.to_csv("Table1.1-RS-OLHC-RSGoogle.csv", index=None)
+reportAUBC.to_csv("Table1-RS-AUBC-RSGoogle-linear.csv", index=None)
+reportLCOLHC.to_csv("Table1.1-RS-OLHC-RSGoogle-linear.csv", index=None)
