@@ -54,19 +54,25 @@ from utils import evaluation
 
 import pdb
 
-
-num_labeled = 20
-qsname = "uniform"
-modelname = "kernel_svm"
-train_valid_test_ratio_list = [0.6, 0, 0.4]
-num_trials = 100
-batch_size_query = 1
+# development
 dev_mode = False
-
+# data
 normalize_data = "False"
 standardize_data = "False"
-tune_hyperparam = "False"
+# model
+modelname = "kernel_svm"
+svm_auto = "False"
+svm_CV = "False"
+# query strategy
+qsname = "uniform"
+batch_size_query = 1
+# experiment
+num_labeled = 20
+ratio_test = 0.4
+train_valid_test_ratio_list = [1 - ratio_test, 0, ratio_test]
+num_trials = 100
 
+# adapative for Google AL toolbox
 sampling_method = qsname
 warmstart_size = num_labeled
 batch_size = batch_size_query
@@ -287,9 +293,9 @@ report2 = {"dataset": [], "OLHC google/active-learning.RS": []}
 def run(seed):
     # Initialize models
     sampler = get_AL_sampler(sampling_method)
-    global tune_hyperparam
-    tune_hyperparam = tune_hyperparam == "True"
-    score_model = utils.get_model(score_method, seed, is_gridsearch=tune_hyperparam)
+    global svm_CV
+    svm_CV = svm_CV == "True"
+    score_model = utils.get_model(score_method, seed, is_gridsearch=svm_CV)
     if (select_method == "None" or
         select_method == score_method):
         select_model = None
