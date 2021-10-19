@@ -65,7 +65,7 @@ svm_auto = "True"
 svm_CV = "False"
 # query strategy
 qsname = "uniform"
-batch_size_query = 1
+batch_size_query = 2
 # experiment
 num_labeled = 20
 min_num_labeled_perClass = 1
@@ -359,5 +359,5 @@ for dataname in tqdm(datanames_list):
 reportAUBC = pd.DataFrame(report)
 reportLCOLHC = pd.DataFrame(report2)
 
-reportAUBC.to_csv("Table1-AUBC-Google-20211017-1.csv", index=None)
-reportLCOLHC.to_csv("Table2-OLHC-Google-20211017-1.csv", index=None)
+reportAUBC.to_csv("Table1-AUBC-Google-20211017-2.csv", index=None)
+reportLCOLHC.to_csv("Table2-OLHC-Google-20211017-2.csv", index=None)
