@@ -68,7 +68,7 @@ qsname = "uniform"
 batch_size_query = 1
 # experiment
 num_labeled = 20
-min_num_labeled_perClass = 1
+min_num_labeled_perClass = 4
 ratio_test = 0.4
 train_valid_test_ratio_list = [1 - ratio_test, 0, ratio_test]
 num_trials = 100
