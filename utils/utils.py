@@ -26,6 +26,7 @@ import numpy as np
 import scipy
 import pandas as pd
 
+from sklearn.datasets import load_svmlight_file
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV
 from sklearn.svm import LinearSVC
@@ -95,7 +96,7 @@ def flatten_X(X):
   return flat_X
 
 
-def get_mldata(data_dir, name):
+def get_mldata(data_dir, name, src="google"):
   """Loads data from data_dir.
 
   Looks for the file in data_dir.
@@ -112,6 +113,11 @@ def get_mldata(data_dir, name):
     NameError: dataset not found in data folder.
   """
   dataname = name
+  if src == "zhan":
+    data = load_svmlight_file("../../data/dataset_used_in_ALSurvey/{0}-svmstyle.txt".format(dataname))
+    X, y = data[0], data[1]
+    X = np.asarray(X.todense())
+    return X, y
   if dataname == "checkerboard":
     X, y = create_checker_unbalanced(split=[1./5, 4./5], n=10000, grid_size=4)
   else:

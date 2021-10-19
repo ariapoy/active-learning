@@ -61,7 +61,7 @@ normalize_data = "False"
 standardize_data = "False"
 # model
 modelname = "kernel_svm"
-svm_auto = "False"
+svm_auto = "True"
 svm_CV = "False"
 # query strategy
 qsname = "uniform"
@@ -324,7 +324,7 @@ for dataname in tqdm(datanames_list):
         max_dataset_size)
     normalize_data = normalize_data == "True"
     standardize_data = standardize_data == "True"
-    X, y = utils.get_mldata(data_dir, dataset)
+    X, y = utils.get_mldata(data_dir, dataset, src="zhan")
     starting_seed = seed
 
     for c in confusions:
@@ -359,5 +359,5 @@ for dataname in tqdm(datanames_list):
 reportAUBC = pd.DataFrame(report)
 reportLCOLHC = pd.DataFrame(report2)
 
-reportAUBC.to_csv("Table1-RS-AUBC-RSGoogle-linear.csv", index=None)
-reportLCOLHC.to_csv("Table1.1-RS-OLHC-RSGoogle-linear.csv", index=None)
+reportAUBC.to_csv("Table1-AUBC-Google-20211017-0.csv", index=None)
+reportLCOLHC.to_csv("Table2-OLHC-Google-20211017-0.csv", index=None)
