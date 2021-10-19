@@ -68,6 +68,7 @@ qsname = "uniform"
 batch_size_query = 1
 # experiment
 num_labeled = 20
+min_num_labeled_perClass = 1
 ratio_test = 0.4
 train_valid_test_ratio_list = [1 - ratio_test, 0, ratio_test]
 num_trials = 100
@@ -179,7 +180,8 @@ def generate_one_curve(X,
 
   indices, X_train, y_train, X_val, y_val, X_test, y_test, y_noise = (
       utils.get_train_val_test_splits(X,y,max_points,seed,confusion,
-                                      seed_batch, split=data_splits))
+                                      seed_batch, split=data_splits,
+                                      least_num_obs_of_each_class=min_num_labeled_perClass))
 
   # Preprocess data
   if norm_data:
@@ -284,9 +286,8 @@ def OLHC(lc):
     return "{0:.3f}({1})/{2:.3f}({3})/{4:.3f}({5})/{6:.3f}({7})".format(*results_tuple)
 
 # main
-# dataname = "iris"
-# datanames_list = ["heart"]
-datanames_list = ["iris", "wine", "sonar", "seeds", "glass", "thyroid-new", "heart", "haberman", "ionosphere", "clean1", "wdbc", "australian", "diabetes", "vehicle", "german.numer"]
+# datanames_list = ["iris", "wine", "sonar", "seeds", "glass", "thyroid", "heart", "haberman", "ionosphere", "clean1", "wdbc", "australian", "diabetes", "vehicle", "german.numer"]
+datanames_list = ["iris", "wine", "sonar", "glass", "heart", "ionosphere", "australian", "diabetes", "vehicle", "german"]
 report = {"dataset": [], "AUBC google/active-learning.RS": []}
 report2 = {"dataset": [], "OLHC google/active-learning.RS": []}
 

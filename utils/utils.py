@@ -280,7 +280,7 @@ def calculate_entropy(batch_size, y_s):
 
 
 def get_train_val_test_splits(X, y, max_points, seed, confusion, seed_batch,
-                              split=(2./3, 1./6, 1./6)):
+                              split=(2./3, 1./6, 1./6), least_num_obs_of_each_class=4):
   """Return training, validation, and test splits for X and y.
 
   Args:
@@ -325,7 +325,7 @@ def get_train_val_test_splits(X, y, max_points, seed, confusion, seed_batch,
   y_tmp = y_noise
 
   # Need at least 4 obs of each class for 2 fold CV to work in grid search step
-  while (any(get_class_counts(y_tmp, y_tmp[0:seed_batch]) < 4)
+  while (any(get_class_counts(y_tmp, y_tmp[0:seed_batch]) < least_num_obs_of_each_class)
          or n_shuffle < min_shuffle):
     np.random.shuffle(indices)
     y_tmp = y_noise[indices]
@@ -338,7 +338,7 @@ def get_train_val_test_splits(X, y, max_points, seed, confusion, seed_batch,
   y_val = y_noise[indices[train_split:val_split]]
   y_test = y_noise[indices[val_split:max_points]]
   # Make sure that we have enough observations of each class for 2-fold cv
-  assert all(get_class_counts(y_noise, y_train[0:seed_batch]) >= 4)
+  assert all(get_class_counts(y_noise, y_train[0:seed_batch]) >= least_num_obs_of_each_class)
   # Make sure that returned shuffled indices are correct
   assert all(y_noise[indices[0:max_points]] ==
              np.concatenate((y_train, y_val, y_test), axis=0))
