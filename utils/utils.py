@@ -350,3 +350,100 @@ def get_train_val_test_splits(X, y, max_points, seed, confusion, seed_batch,
              np.concatenate((y_train, y_val, y_test), axis=0))
   return (indices[0:max_points], X_train, y_train,
           X_val, y_val, X_test, y_test, y_noise)
+
+class Dataset():
+    """Dataset
+
+    This class implements dataset objective.
+
+    Parameters
+    ----------
+    X: numpy.ndarray, feature matrix
+    y: numpy.ndarray, label vector
+
+    """
+    def __init__(self, X, y, num_initlabel=10, ratio_test=0.33, source="openml"):
+        self._X = X
+        self._y = y
+        self.source = source
+        self._nclass = len(np.unique(self._y))
+        self._idx = np.arange(self._X.shape[0])
+        self._n_initlabeled = num_initlabel
+        self.ratio_test = ratio_test
+
+        self.D_train_idx = None
+        self.D_test_idx = None
+        self.D_label_idx = None
+        self.D_unlabel_idx = None
+
+    def train_test_split(self, SEED=0, dataname=None):
+        """train_test_split
+
+        Get training testing dataset from full dataset  by index.
+
+        """
+
+        if self.source == "google":
+            data_dir = "../env/active-learning/tmp/data/"
+            dataset = dataname
+            X, y = utils.get_mldata(data_dir, dataset)
+            seed = SEED
+            data_google = _generate_one_feature(
+                X, y, seed, self._n_initlabeled,
+                1, 0.0, 15000,
+                False, False,
+                ratio_test=self.ratio_test)
+            num_train = int((1 - self.ratio_test)*y.shape[0])
+            if isinstance(X, pd.DataFrame):
+                X = X.values
+            if isinstance(X, csr_matrix):
+                X = X.toarray()
+            if isinstance(y, pd.Series):
+                y = y.values
+            if isinstance(y, pd.Categorical):
+                y = y.to_numpy()
+
+            try:
+                assert isinstance(X, np.ndarray)
+                assert isinstance(y, np.ndarray)
+            except:
+                print("Error Type of X & y.")
+                pdb.set_trace()
+
+            self._X, self._y = copy.deepcopy(X), copy.deepcopy(y)
+            self.D_train_idx = data_google["indices"][:num_train]
+            self.D_test_idx = data_google["indices"][num_train:]
+            self.D_label_idx = self.D_train_idx[:self._n_initlabeled]
+            self.D_unlabel_idx = self.D_train_idx[self._n_initlabeled:]
+        else:
+            rng_traintest = np.random.default_rng(SEED)
+            self.D_test_idx = rng_traintest.choice(self._idx, size=int(self._X.shape[0]*self.ratio_test), replace=False)
+            self.D_train_idx = self._idx[~np.isin(self._idx, self.D_test_idx)]
+
+    def init_label_pool_split(self, SEED=0):
+        """
+
+        Get initial labeled pool from training dataset by index.
+
+        """
+        if self.source == "google":
+            pass
+        else:
+            rng_initlabel = np.random.default_rng(SEED)
+            self.D_label_idx = rng_initlabel.choice(self.D_train_idx, size=self._n_initlabeled, replace=False)
+            self.D_unlabel_idx = self.D_train_idx[~np.isin(self.D_train_idx, self.D_label_idx)]
+
+    def export_google_format(self, seed):
+      self.train_test_split(seed)
+      self.init_label_pool_split(seed)
+      indices = np.array(self.D_label_idx.tolist() + self.D_unlabel_idx.tolist() + self.D_test_idx.tolist())
+      train_idx = np.concatenate([self.D_label_idx, self.D_unlabel_idx])
+      X_train = self._X[train_idx, :]
+      y_train = self._y[train_idx]
+      max_idx = np.max(indices)
+      X_val = self._X[max_idx+1:, :]
+      y_val = self._y[max_idx+1:]
+      X_test = self._X[self.D_test_idx, :]
+      y_test = self._y[self.D_test_idx]
+      y_noise = self._y[:]
+      return indices, X_train, y_train, X_val, y_val, X_test, y_test, y_noise

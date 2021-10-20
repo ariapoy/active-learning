@@ -65,10 +65,10 @@ svm_auto = "True"
 svm_CV = "False"
 # query strategy
 qsname = "uniform"
-batch_size_query = 2
+batch_size_query = 1
 # experiment
 num_labeled = 20
-min_num_labeled_perClass = 1
+min_num_labeled_perClass = 2
 ratio_test = 0.4
 train_valid_test_ratio_list = [1 - ratio_test, 0, ratio_test]
 num_trials = 100
@@ -178,10 +178,14 @@ def generate_one_curve(X,
     seed_batch = int(warmstart_size)
   seed_batch = max(seed_batch, 6 * len(np.unique(y)))
 
-  indices, X_train, y_train, X_val, y_val, X_test, y_test, y_noise = (
-      utils.get_train_val_test_splits(X,y,max_points,seed,confusion,
-                                      seed_batch, split=data_splits,
-                                      least_num_obs_of_each_class=min_num_labeled_perClass))
+  # indices_goo, X_train_goo, y_train_goo, X_val_goo, y_val_goo, X_test_goo, y_test_goo, y_noise_goo = (
+  #     utils.get_train_val_test_splits(X,y,max_points,seed,confusion,
+  #                                     seed_batch, split=data_splits,
+  #                                     least_num_obs_of_each_class=min_num_labeled_perClass))
+  dataset_instance = utils.Dataset(X, y, num_initlabel=warmstart_size, ratio_test=ratio_test, source="zhan")
+  indices, X_train, y_train, X_val, y_val, X_test, y_test, y_noise = dataset_instance.export_google_format(seed)
+  if np.unique(dataset_instance._y[dataset_instance.D_label_idx]).shape[0] != np.unique(y_noise).shape[0]:
+    return None, None
 
   # Preprocess data
   if norm_data:
@@ -286,8 +290,8 @@ def OLHC(lc):
     return "{0:.3f}({1})/{2:.3f}({3})/{4:.3f}({5})/{6:.3f}({7})".format(*results_tuple)
 
 # main
-# datanames_list = ["iris", "wine", "sonar", "seeds", "glass", "thyroid", "heart", "haberman", "ionosphere", "clean1", "wdbc", "australian", "diabetes", "vehicle", "german.numer"]
-datanames_list = ["iris", "wine", "sonar", "glass", "heart", "ionosphere", "australian", "diabetes", "vehicle", "german"]
+datanames_list = ["appendicitis", "iris", "wine", "sonar", "seeds", "glass", "thyroid", "heart", "haberman", "ionosphere", "clean1", "breast", "wdbc", "australian", "diabetes", "vehicle", "german", "splice"]
+
 report = {"dataset": [], "AUBC google/active-learning.RS": []}
 report2 = {"dataset": [], "OLHC google/active-learning.RS": []}
 
@@ -310,13 +314,16 @@ def run(seed):
     key = (dataset, sampling_method, score_method,
             select_method, m, warmstart_size, batch_size,
             c, standardize_data, normalize_data, seed)
+    if results == None:
+      return key, None
     sampler_output = sampler_state.to_dict()
     results["sampler_output"] = sampler_output
     return key, results
 
 
-for dataname in tqdm(datanames_list):
+for dataname in datanames_list:
     dataset = dataname
+    print(dataset)
     confusions = [float(t) for t in confusions]
     mixtures = [float(t) for t in active_sampling_percentage]
     all_results = {}
@@ -343,6 +350,7 @@ for dataname in tqdm(datanames_list):
 
     table3_lcs_RS = []
     for exp_key in all_results:
+      if all_results[exp_key] is not None:
         table3_lcs_RS.append(all_results[exp_key]["accuracy"])
 
     table3_lcs_RS = np.array(table3_lcs_RS)
