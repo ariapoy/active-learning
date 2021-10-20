@@ -71,7 +71,7 @@ num_labeled = 20
 min_num_labeled_perClass = 2
 ratio_test = 0.4
 train_valid_test_ratio_list = [1 - ratio_test, 0, ratio_test]
-num_trials = 100
+num_trials = 10**6
 
 # adapative for Google AL toolbox
 sampling_method = qsname
@@ -178,14 +178,14 @@ def generate_one_curve(X,
     seed_batch = int(warmstart_size)
   seed_batch = max(seed_batch, 6 * len(np.unique(y)))
 
-  # indices_goo, X_train_goo, y_train_goo, X_val_goo, y_val_goo, X_test_goo, y_test_goo, y_noise_goo = (
-  #     utils.get_train_val_test_splits(X,y,max_points,seed,confusion,
-  #                                     seed_batch, split=data_splits,
-  #                                     least_num_obs_of_each_class=min_num_labeled_perClass))
-  dataset_instance = utils.Dataset(X, y, num_initlabel=warmstart_size, ratio_test=ratio_test, source="zhan")
-  indices, X_train, y_train, X_val, y_val, X_test, y_test, y_noise = dataset_instance.export_google_format(seed)
-  if np.unique(dataset_instance._y[dataset_instance.D_label_idx]).shape[0] != np.unique(y_noise).shape[0]:
-    return None, None
+  indices, X_train, y_train, X_val, y_val, X_test, y_test, y_noise = (
+      utils.get_train_val_test_splits(X,y,max_points,seed,confusion,
+                                      seed_batch, split=data_splits,
+                                      least_num_obs_of_each_class=min_num_labeled_perClass))
+  # dataset_instance = utils.Dataset(X, y, num_initlabel=warmstart_size, ratio_test=ratio_test, source="zhan")
+  # indices, X_train, y_train, X_val, y_val, X_test, y_test, y_noise = dataset_instance.export_google_format(seed)
+  # if np.unique(dataset_instance._y[dataset_instance.D_label_idx]).shape[0] != np.unique(y_noise).shape[0]:
+  #   return None, None
 
   # Preprocess data
   if norm_data:
@@ -290,7 +290,9 @@ def OLHC(lc):
     return "{0:.3f}({1})/{2:.3f}({3})/{4:.3f}({5})/{6:.3f}({7})".format(*results_tuple)
 
 # main
-datanames_list = ["appendicitis", "iris", "wine", "sonar", "seeds", "glass", "thyroid", "heart", "haberman", "ionosphere", "clean1", "breast", "wdbc", "australian", "diabetes", "vehicle", "german", "splice"]
+# datanames_list = ["appendicitis", "iris", "wine", "sonar", "seeds", "glass", "thyroid", "heart", "haberman", "ionosphere", "clean1", "breast", "wdbc", "australian", "diabetes", "vehicle", "german", "splice"]
+
+datanames_list = ["appendicitis"]
 
 report = {"dataset": [], "AUBC google/active-learning.RS": []}
 report2 = {"dataset": [], "OLHC google/active-learning.RS": []}
@@ -357,6 +359,9 @@ for dataname in datanames_list:
     num_queries = np.arange(num_labeled, num_labeled + table3_lcs_RS[0].shape[0])
     table3_aubc_RS = np.array([evaluation.AUBC(num_queries, table3_lcs_RS[exp_id]) for exp_id in range(table3_lcs_RS.shape[0])])
 
+    collect_aubc_df = pd.DataFrame(table3_aubc_RS)
+    collect_aubc_df.columns = ["AUBC"]
+
     report["dataset"].append(dataname)
     report["AUBC google/active-learning.RS"].append(table3_summary(table3_aubc_RS, 1))
 
@@ -367,5 +372,6 @@ for dataname in datanames_list:
 reportAUBC = pd.DataFrame(report)
 reportLCOLHC = pd.DataFrame(report2)
 
-reportAUBC.to_csv("Table1-AUBC-Google-20211017-2.csv", index=None)
-reportLCOLHC.to_csv("Table2-OLHC-Google-20211017-2.csv", index=None)
+reportAUBC.to_csv("Table1-AUBC-Google-20211020-0.csv", index=None)
+reportLCOLHC.to_csv("Table2-OLHC-Google-20211020-0.csv", index=None)
+collect_aubc_df.to_csv("Table3-AUBC-collect-Google-20211020-0.csv", index=None)
