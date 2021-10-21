@@ -57,6 +57,8 @@ import pdb
 # development
 dev_mode = False
 # data
+# datanames_list = ["appendicitis", "iris", "wine", "sonar", "seeds", "glass", "thyroid", "heart", "haberman", "ionosphere", "clean1", "breast", "wdbc", "australian", "diabetes", "vehicle", "german", "splice"]
+dataname = "iris"
 normalize_data = "False"
 standardize_data = "False"
 # model
@@ -71,7 +73,7 @@ num_labeled = 20
 min_num_labeled_perClass = 2
 ratio_test = 0.4
 train_valid_test_ratio_list = [1 - ratio_test, 0, ratio_test]
-num_trials = 10**6
+num_trials = 10**5
 
 # adapative for Google AL toolbox
 sampling_method = qsname
@@ -289,11 +291,6 @@ def OLHC(lc):
     results_tuple = (open_value, open_idx, low_value, low_idx, high_value, high_idx, close_value, close_idx)
     return "{0:.3f}({1})/{2:.3f}({3})/{4:.3f}({5})/{6:.3f}({7})".format(*results_tuple)
 
-# main
-# datanames_list = ["appendicitis", "iris", "wine", "sonar", "seeds", "glass", "thyroid", "heart", "haberman", "ionosphere", "clean1", "breast", "wdbc", "australian", "diabetes", "vehicle", "german", "splice"]
-
-datanames_list = ["appendicitis"]
-
 report = {"dataset": [], "AUBC google/active-learning.RS": []}
 report2 = {"dataset": [], "OLHC google/active-learning.RS": []}
 
@@ -323,55 +320,54 @@ def run(seed):
     return key, results
 
 
-for dataname in datanames_list:
-    dataset = dataname
-    print(dataset)
-    confusions = [float(t) for t in confusions]
-    mixtures = [float(t) for t in active_sampling_percentage]
-    all_results = {}
-    max_dataset_size = None if max_dataset_size == "0" else int(
-        max_dataset_size)
-    normalize_data = normalize_data == "True"
-    standardize_data = standardize_data == "True"
-    X, y = utils.get_mldata(data_dir, dataset, src="zhan")
-    starting_seed = seed
+dataset = dataname
+print(dataset)
+confusions = [float(t) for t in confusions]
+mixtures = [float(t) for t in active_sampling_percentage]
+all_results = {}
+max_dataset_size = None if max_dataset_size == "0" else int(
+    max_dataset_size)
+normalize_data = normalize_data == "True"
+standardize_data = standardize_data == "True"
+X, y = utils.get_mldata(data_dir, dataset, src="zhan")
+starting_seed = seed
 
-    for c in confusions:
-        for m in mixtures:
-            if dev_mode:
-                for seed in range(3):
-                    key_curr, results_curr = run(seed)
-                    all_results[key_curr] = results_curr
-            else:
-                with Pool(6) as p:
-                    imap_unordered_it = p.imap_unordered(run,
-                                            range(starting_seed, starting_seed + trials)
-                                        )
-                    for res in imap_unordered_it:
-                        all_results[res[0]] = res[1]
+for c in confusions:
+    for m in mixtures:
+        if dev_mode:
+            for seed in range(3):
+                key_curr, results_curr = run(seed)
+                all_results[key_curr] = results_curr
+        else:
+            with Pool(6) as p:
+                imap_unordered_it = p.imap_unordered(run,
+                                        range(starting_seed, starting_seed + trials)
+                                    )
+                for res in imap_unordered_it:
+                    all_results[res[0]] = res[1]
 
-    table3_lcs_RS = []
-    for exp_key in all_results:
-      if all_results[exp_key] is not None:
-        table3_lcs_RS.append(all_results[exp_key]["accuracy"])
+table3_lcs_RS = []
+for exp_key in all_results:
+  if all_results[exp_key] is not None:
+    table3_lcs_RS.append(all_results[exp_key]["accuracy"])
 
-    table3_lcs_RS = np.array(table3_lcs_RS)
-    num_queries = np.arange(num_labeled, num_labeled + table3_lcs_RS[0].shape[0])
-    table3_aubc_RS = np.array([evaluation.AUBC(num_queries, table3_lcs_RS[exp_id]) for exp_id in range(table3_lcs_RS.shape[0])])
+table3_lcs_RS = np.array(table3_lcs_RS)
+num_queries = np.arange(num_labeled, num_labeled + table3_lcs_RS[0].shape[0])
+table3_aubc_RS = np.array([evaluation.AUBC(num_queries, table3_lcs_RS[exp_id]) for exp_id in range(table3_lcs_RS.shape[0])])
 
-    collect_aubc_df = pd.DataFrame(table3_aubc_RS)
-    collect_aubc_df.columns = ["AUBC"]
+collect_aubc_df = pd.DataFrame(table3_aubc_RS)
+collect_aubc_df.columns = ["AUBC"]
 
-    report["dataset"].append(dataname)
-    report["AUBC google/active-learning.RS"].append(table3_summary(table3_aubc_RS, 1))
+report["dataset"].append(dataname)
+report["AUBC google/active-learning.RS"].append(table3_summary(table3_aubc_RS, 1))
 
-    report2["dataset"].append(dataname)
-    mean_lc_RS = table3_lcs_RS.mean(axis=0)
-    report2["OLHC google/active-learning.RS"].append(OLHC(mean_lc_RS))
+report2["dataset"].append(dataname)
+mean_lc_RS = table3_lcs_RS.mean(axis=0)
+report2["OLHC google/active-learning.RS"].append(OLHC(mean_lc_RS))
 
 reportAUBC = pd.DataFrame(report)
 reportLCOLHC = pd.DataFrame(report2)
 
-reportAUBC.to_csv("Table1-AUBC-Google-20211020-0.csv", index=None)
-reportLCOLHC.to_csv("Table2-OLHC-Google-20211020-0.csv", index=None)
-collect_aubc_df.to_csv("Table3-AUBC-collect-Google-20211020-0.csv", index=None)
+reportAUBC.to_csv("Table1-AUBC-Google-20211020-{0}.csv".format(dataname), index=None)
+reportLCOLHC.to_csv("Table2-OLHC-Google-20211020-{0}.csv".format(dataname), index=None)
+collect_aubc_df.to_csv("Table3-AUBC-collect-Google-20211020-{0}.csv".format(dataname), index=None)
