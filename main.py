@@ -32,6 +32,7 @@ from __future__ import print_function
 import os
 import pickle
 import sys
+import argparse
 from time import gmtime
 from time import strftime
 from tqdm import tqdm
@@ -54,11 +55,21 @@ from utils import evaluation
 
 import pdb
 
+def parse_args():
+    parser = argparse.ArgumentParser(description='Survey experiments on active learning.')
+    parser.add_argument('--data_set', dest='data_set',
+                                        help='provide the file name of .txt file for running',
+                                        default="iris", type=str)
+    args = parser.parse_args()
+    return args
+
+args = parse_args()
+
 # development
 dev_mode = False
 # data
 # datanames_list = ["appendicitis", "iris", "wine", "sonar", "seeds", "glass", "thyroid", "heart", "haberman", "ionosphere", "clean1", "breast", "wdbc", "australian", "diabetes", "vehicle", "german", "splice"]
-dataname = "iris"
+dataname = args.data_set
 normalize_data = "False"
 standardize_data = "False"
 # model
