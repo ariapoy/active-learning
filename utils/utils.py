@@ -31,12 +31,19 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.svm import LinearSVC
 from sklearn.svm import SVC
 
-import tensorflow.compat.v1.gfile as gfile
-
+try:
+  import tensorflow.compat.v1.gfile as gfile
+except:
+  print("This environment doesn\'t support TensorFlow.")
+  pass
 
 from utils.kernel_block_solver import BlockKernelSolver
-from utils.small_cnn import SmallCNN
-from utils.allconv import AllConv
+try:
+  from utils.small_cnn import SmallCNN
+  from utils.allconv import AllConv
+except:
+  print("This environment doesn\'t support TensorFlow.")
+  pass
 
 
 class Logger(object):
