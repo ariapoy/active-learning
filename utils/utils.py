@@ -30,6 +30,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV
 from sklearn.svm import LinearSVC
 from sklearn.svm import SVC
+from sklearn.gaussian_process import GaussianProcessClassifier
+from sklearn.gaussian_process.kernels import RBF
 
 try:
   import tensorflow.compat.v1.gfile as gfile
@@ -228,16 +230,19 @@ def get_model(method, seed=13, is_gridsearch=False):
   # but should probably tune.
   if method == "logistic":
     model = LogisticRegression(random_state=seed, multi_class="multinomial",
-                               solver="lbfgs", max_iter=200)
+                               solver="lbfgs", max_iter=200, penalty="l2",
+                               C=1)
     params = {"C": [10.0**(i) for i in range(-4, 5)]}
   elif method == "logistic_ovr":
     model = LogisticRegression(random_state=seed)
     params = {"C": [10.0**(i) for i in range(-5, 4)]}
   elif method == "linear_svm":
-    model = LinearSVC(random_state=seed)
+    model = LinearSVC(random_state=seed,
+                      penalty="l2", loss="squared_hinge", dual=False, C=1, multi_class="ovr")
     params = {"C": [10.0**(i) for i in range(-4, 5)]}
   elif method == "kernel_svm":
-    model = SVC(gamma="auto", random_state=seed, probability=True)
+    model = SVC(gamma="auto", random_state=seed, probability=True,
+                C=1, kernel="rbf", decision_function_shape="ovr")
     params = {"C": [10.0**(i) for i in range(-4, 5)]}
   elif method == "kernel_ls":
     model = BlockKernelSolver(random_state=seed)
@@ -250,7 +255,9 @@ def get_model(method, seed=13, is_gridsearch=False):
     # Model does not work with weighted_expert or simulate_batch
     model = AllConv(random_state=seed)
     return model
-
+  elif method=="GPC":
+    model = GaussianProcessClassifier(random_state=seed, kernel=None, optimizer="fmin_l_bfgs_b",
+                                      multi_class="one_vs_rest")
   else:
     raise NotImplementedError("ERROR: " + method + " not implemented")
 
