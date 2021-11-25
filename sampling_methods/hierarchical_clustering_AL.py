@@ -106,7 +106,7 @@ class HierarchicalClusterAL(SamplingMethod):
     # Fit cluster and update cluster variables
 
     self.create_tree()
-    print('Finished creating hierarchical cluster')
+    # print('Finished creating hierarchical cluster')
 
   def fit_cluster(self, X):
     if not self.already_clustered:
@@ -326,14 +326,14 @@ class HierarchicalClusterAL(SamplingMethod):
     if not self.initialized:
       self.initialize_algo()
       self.initialized = True
-      print('Initialized algo')
+      # print('Initialized algo')
 
-    print('Updating scores and pruning for labels from last batch')
+    # print('Updating scores and pruning for labels from last batch')
     self.update_scores()
     self.update_pruning_labels()
-    print('Nodes in pruning: %d' % (len(self.pruning)))
-    print('Actual impurity for pruning is: %.2f' %
-          (self.get_pruning_impurity(y)))
+    # print('Nodes in pruning: %d' % (len(self.pruning)))
+    # print('Actual impurity for pruning is: %.2f' %
+          # (self.get_pruning_impurity(y)))
 
     # TODO(lishal): implement multiple selection methods
     selected_nodes = set()
@@ -343,7 +343,7 @@ class HierarchicalClusterAL(SamplingMethod):
     weights = weights / sum(weights)
     batch = []
 
-    print('Sampling batch')
+    # print('Sampling batch')
     while len(batch) < N:
       node = np.random.choice(list(self.pruning), p=weights)
       children = self.get_child_leaves(node)
