@@ -113,7 +113,7 @@ class HierarchicalClusterAL(SamplingMethod):
       self.model.fit(X)
       self.already_clustered = True
     self.n_leaves = self.model.n_leaves_
-    self.n_components = self.model.n_components_
+    self.n_components = self.model.n_connected_components_
     self.children_list = self.model.children_
 
   def create_tree(self):
