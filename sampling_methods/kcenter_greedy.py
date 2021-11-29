@@ -91,12 +91,12 @@ class kCenterGreedy(SamplingMethod):
     try:
       # Assumes that the transform function takes in original data and not
       # flattened data.
-      print('Getting transformed features...')
+      # print('Getting transformed features...')
       self.features = model.transform(self.X)
-      print('Calculating distances...')
+      # print('Calculating distances...')
       self.update_distances(already_selected, only_new=False, reset_dist=True)
     except:
-      print('Using flat_X as features.')
+      # print('Using flat_X as features.')
       self.update_distances(already_selected, only_new=True, reset_dist=False)
 
     new_batch = []
@@ -113,8 +113,8 @@ class kCenterGreedy(SamplingMethod):
 
       self.update_distances([ind], only_new=True, reset_dist=False)
       new_batch.append(ind)
-    print('Maximum distance from cluster centers is %0.2f'
-            % max(self.min_distances))
+    # print('Maximum distance from cluster centers is %0.2f'
+            # % max(self.min_distances))
 
 
     self.already_selected = already_selected
