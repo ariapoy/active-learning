@@ -61,9 +61,16 @@ class RepresentativeClusterMeanSampling(SamplingMethod):
 
     distances = abs(model.decision_function(self.X))
     min_margin_by_class = np.min(abs(distances[already_selected]),axis=0)
+    unlabeled_in_margin = []
+    # issue 5. googleAL.mcm TypeError("'bool' object is not iterable",) when trying to return a Boolean
+    # for i in range(len(self.y)):
+    #   if i not in already_selected and np.any(distances[i]<min_margin_by_class):
+    #     unlabeled_in_margin.append(i)
+    # unlabeled_in_margin = np.array(unlabeled_in_margin)
     unlabeled_in_margin = np.array([i for i in range(len(self.y))
                                     if i not in already_selected and
-                                    any(distances[i]<min_margin_by_class)])
+                                    np.any(distances[i]<min_margin_by_class)])
+
     if len(unlabeled_in_margin) < N:
       print("Not enough points within margin of classifier, using simple uncertainty sampling")
       return rank_ind[0:N]
