@@ -59,7 +59,10 @@ class RepresentativeClusterMeanSampling(SamplingMethod):
     rank_ind = np.argsort(min_margin)
     rank_ind = [i for i in rank_ind if i not in already_selected]
 
-    distances = abs(model.decision_function(self.X))
+    try:
+      distances = abs(model.decision_function(self.X))
+    except:
+      distances = abs(model.predict_proba(self.X))
     min_margin_by_class = np.min(abs(distances[already_selected]),axis=0)
     unlabeled_in_margin = []
     # issue 5. googleAL.mcm TypeError("'bool' object is not iterable",) when trying to return a Boolean
